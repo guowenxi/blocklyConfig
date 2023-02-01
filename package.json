@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "build": "babel j -d dist",
+    "task": "rimraf dist && gulp task"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.19.0",
+    "@babel/preset-env": "^7.19.0",
+    "babel-core": "^7.0.0-0",
+    "babel-preset-env": "^1.7.0",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-useref": "^5.0.0",
+    "gulp-watch": "^5.0.1"
+  }
+}

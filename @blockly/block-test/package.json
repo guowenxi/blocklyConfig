@@ -1,0 +1,67 @@
+{
+  "name": "@blockly/block-test",
+  "version": "2.0.4",
+  "description": "A group of Blockly test blocks.",
+  "scripts": {
+    "audit:fix": "blockly-scripts auditFix",
+    "build": "blockly-scripts build",
+    "clean": "blockly-scripts clean",
+    "lint": "blockly-scripts lint",
+    "prepublishOnly": "npm run clean && npm run build",
+    "start": "blockly-scripts start"
+  },
+  "main": "./dist/index.js",
+  "module": "./src/index.js",
+  "unpkg": "./dist/index.js",
+  "author": "Blockly Team",
+  "keywords": [
+    "blockly",
+    "blockly-plugin",
+    "blockly-block",
+    "test"
+  ],
+  "homepage": "https://github.com/google/blockly-samples/tree/master/plugins/block-test#readme",
+  "bugs": {
+    "url": "https://github.com/google/blockly-samples/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/blockly-samples.git",
+    "directory": "plugins/block-test"
+  },
+  "license": "Apache 2.0",
+  "directories": {
+    "dist": "dist",
+    "src": "src"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "devDependencies": {
+    "@blockly/dev-scripts": "^1.2.14",
+    "blockly": "^7.20211209.0"
+  },
+  "peerDependencies": {
+    "blockly": "^7.20211209.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://wombat-dressing-room.appspot.com"
+  },
+  "eslintConfig": {
+    "extends": "@blockly/eslint-config"
+  },
+  "engines": {
+    "node": ">=8.17.0"
+  },
+  "browserslist": [
+    "defaults",
+    "IE 11",
+    "IE_Mob 11"
+  ],
+  "gitHead": "3832abc63faaf5fe5d40a2e4c2dcfea90267e391",
+  "__npminstall_done": "Tue Mar 22 2022 11:36:23 GMT+0800 (中国标准时间)",
+  "_from": "@blockly/block-test@2.0.4",
+  "_resolved": "https://registry.npmmirror.com/@blockly/block-test/-/block-test-2.0.4.tgz"
+}

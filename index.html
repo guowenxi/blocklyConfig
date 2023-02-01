@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Blockly Playground</title>
+<script src="blockly_uncompressed.js"></script>
+<script src="./msg/messages.js"></script>
+<!-- <script src="./themes/test_themes.js"></script>
+<script src="./playgrounds/screenshot.js"></script> -->
+<script src="./@blockly/block-test/dist/index.js"></script>
+<script src="./msg/js/zh-hans.js"></script>
+<!-- //调试代码不支持es6  -->
+<script src="./interpreter/acorn_interpreter.js"></script>
+<script src="./interpreter/acorn.js"></script>
+<script src="./interpreter/interpreter.js"></script>
+<script src="./config.js"></script>
+<script src="./http.js"></script>
+<script src="./ws.js"></script>
+<script src="./fn.js"></script>
+<script>
+  // Custom requires for the playground.
+  goog.require('Blockly.Dart.all');
+  goog.require('Blockly.JavaScript.all');
+  goog.require('Blockly.Lua.all');
+  goog.require('Blockly.PHP.all');
+  goog.require('Blockly.Python.all');
+  goog.require('Blockly.WorkspaceCommentSvg');
+  goog.require('Blockly.blocks.all');
+  </script>
+<script src="./device.js"></script>
+<script src="./blockly_fn.js"></script>
+<style>
+  .blocklyDropDownContent::-webkit-scrollbar {/*滚动条整体样式*/
+        width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
+        height: 1px;
+    }
+    .blocklyDropDownContent::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+        border-radius: 5px;
+        background: #e2e6eb;
+    }
+    .blocklyDropDownContent::-webkit-scrollbar-track {/*滚动条里面轨道*/
+        background: transparent;
+    }
+  body{
+    color:#585858;
+  }
+.button{
+  font-size: 14px;
+  padding:10px;
+  line-height: 16px;
+  display: inline-block;
+  cursor: pointer;
+  background: #0257cc;
+  color:#fff;
+  border-radius: 3px;;
+}
+</style>
+</head>
+<body>
+  <div>
+    <!-- <div class="button" id="cancel">取消</div> -->
+    <div class="button" id="save">保存</div>
+    <!-- <div class="button" id="clear">清空</div> -->
+    <!-- <div class="button" id="run">运行</div> -->
+    <!-- <div class="button" id="import">导入</div> -->
+    <!-- <div class="button" id="devjs">运行</div>
+    <div class="button" id="saveEval">在后台运行</div>
+    <div class="button" id="createSChedule">启动计划任务</div>
+    <div class="button" id="updateSChedule">更新计划任务</div>
+    <div class="button" id="stopSChedule">停止计划任务</div>
+    <div class="button" id="deleteSChedule">删除计划任务</div> -->
+  </div>
+  <div id="blocklyDiv" style="width: 100w;height:90vh;margin-top:10px;"></div>
+
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+    <category name="逻辑" colour="%{BKY_LOGIC_HUE}">
+      <block type="controls_if"></block>
+      <block type="controls_if">
+        <mutation else="1"></mutation>
+      </block>
+      <block type="controls_if">
+        <mutation elseif="1" else="1"></mutation>
+      </block>
+    </category>
+    <category name="布尔" colour="%{BKY_LOGIC_HUE}">
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category name="循环" colour="%{BKY_LOOPS_HUE}">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <field name="VAR">i</field>
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="数学" colour="%{BKY_MATH_HUE}">
+      <block type="math_number">
+        <field name="NUM">123</field>
+      </block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+      <block type="math_atan2"></block>
+    </category>
+    <category name="列表" colour="%{BKY_LISTS_HUE}">
+      <block type="lists_create_empty"></block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <block type="math_number">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf"></block>
+      <block type="lists_getIndex"></block>
+      <block type="lists_setIndex"></block>
+    </category>
+    <sep></sep>
+    <category name="变量" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
+    </category>
+    <category name="函数" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
+    </category>
+    <sep></sep>
+    <category name="取值" colour="%{BKY_PROCEDURES_HUE}">
+      <block type="load_point_block" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="LEFT"></mutation>
+        <field name="NAME">load_point_block</field>
+        <field name="INLINE">AUTO</field>
+        <field name="CONNECTIONS">LEFT</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="M3xdBFB89@.)o9~DjDPU">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="A:eS%];}j2SR?c@qPk_z">
+                <field name="TEXT">读取设备点位值</field>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="C9M?px5M}4UUOk?#ubwc">
+                <field name="ALIGN">CENTRE</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="3{fP9cpi~AbrygQIF|k,">
+                    <field name="TEXT">设备</field>
+                    <next>
+                      <block type="field_dropdown" id="KYA4nQY^Dt^{Kof|K4.I">
+                        <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                        <field name="FIELDNAME">device</field>
+                        <field name="USER0">option</field>
+                        <field name="CPU0">OPTIONNAME</field>
+                        <field name="USER1">option</field>
+                        <field name="CPU1">OPTIONNAME</field>
+                        <field name="USER2">option</field>
+                        <field name="CPU2">OPTIONNAME</field>
+                        <next>
+                          <block type="field_static" id="GMO$6t|klbA}50?QPFb$">
+                            <field name="TEXT">点位</field>
+                            <next>
+                              <block type="field_dropdown" id="v=k!b_$1Wz]]rrBIQ%qS">
+                                <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                                <field name="FIELDNAME">value</field>
+                                <field name="USER0">option</field>
+                                <field name="CPU0">OPTIONNAME</field>
+                                <field name="USER1">option</field>
+                                <field name="CPU1">OPTIONNAME</field>
+                                <field name="USER2">option</field>
+                                <field name="CPU2">OPTIONNAME</field>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="=T`wFJ1c226F+WpBTqlF" deletable="false" movable="false">
+            <field name="TEXT">读取设备点位值</field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="r96$%,`m*}!|4I?3bXek" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="OUTPUTTYPE">
+          <shadow type="type_null" id="@-F1)!33U5v./[BX*mtL"></shadow>
+          <block type="type_string" id="=ySl!m8zAxGG0uIR%sZ1"></block>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="NKM:7f!ux8sN)E2mCx=I">
+            <mutation colour="#5b6da5"></mutation>
+            <field name="HUE">225</field>
+          </block>
+        </value>
+      </block>
+    </category>
+    <category name="赋值" colour="%{BKY_PROCEDURES_HUE}">
+      <block type="send_point_block" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="LEFT"></mutation>
+        <field name="NAME">send_point_block</field>
+        <field name="INLINE">AUTO</field>
+        <field name="CONNECTIONS">LEFT</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="M3xdBFB89@.)o9~DjDPU">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="A:eS%];}j2SR?c@qPk_z">
+                <field name="TEXT">下发设备点位值</field>
+              </block>
+            </statement>
+            <next>
+              <block type="input_dummy" id="C9M?px5M}4UUOk?#ubwc">
+                <field name="ALIGN">CENTRE</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="3{fP9cpi~AbrygQIF|k,">
+                    <field name="TEXT">设备</field>
+                    <next>
+                      <block type="field_dropdown" id="KYA4nQY^Dt^{Kof|K4.I">
+                        <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                        <field name="FIELDNAME">device</field>
+                        <field name="USER0">option</field>
+                        <field name="CPU0">OPTIONNAME</field>
+                        <field name="USER1">option</field>
+                        <field name="CPU1">OPTIONNAME</field>
+                        <field name="USER2">option</field>
+                        <field name="CPU2">OPTIONNAME</field>
+                        <next>
+                          <block type="field_static" id="GMO$6t|klbA}50?QPFb$">
+                            <field name="TEXT">点位</field>
+                            <next>
+                              <block type="field_dropdown" id="v=k!b_$1Wz]]rrBIQ%qS">
+                                <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                                <field name="FIELDNAME">point</field>
+                                <field name="USER0">option</field>
+                                <field name="CPU0">OPTIONNAME</field>
+                                <field name="USER1">option</field>
+                                <field name="CPU1">OPTIONNAME</field>
+                                <field name="USER2">option</field>
+                                <field name="CPU2">OPTIONNAME</field>
+                                <next>
+                                  <block type="field_static" id="S;X;hT!oy5i)|~iJi/5Q">
+                                    <field name="TEXT">值</field>
+                                    <next>
+                                      <block type="field_angle" id="halmv?%zrYJs=Sa^dMXz">
+                                        <field name="ANGLE">90</field>
+                                        <field name="FIELDNAME">value</field>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="=T`wFJ1c226F+WpBTqlF" deletable="false" movable="false">
+            <field name="TEXT">下发设备点位值</field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="r96$%,`m*}!|4I?3bXek" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="OUTPUTTYPE">
+          <shadow type="type_null" id="@-F1)!33U5v./[BX*mtL"></shadow>
+          <block type="type_string" id="=ySl!m8zAxGG0uIR%sZ1"></block>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="NKM:7f!ux8sN)E2mCx=I">
+            <mutation colour="#5ba56d"></mutation>
+            <field name="HUE">135</field>
+          </block>
+        </value>
+      </block>
+    </category>
+    <category name="定时器" colour="%{BKY_PROCEDURES_HUE}">
+      <block type="sleep_block" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="BOTH"></mutation>
+        <field name="NAME">sleep_block</field>
+        <field name="INLINE">INT</field>
+        <field name="CONNECTIONS">BOTH</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="w_LF-=ENalY%J*F0@sPa">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="7CpM/x.:mOc8@;C+Y:N{">
+                <field name="TEXT">延迟</field>
+              </block>
+            </statement>
+            <next>
+              <block type="input_value" id="%Vp()p,Xp`/4e^idiDd}">
+                <field name="INPUTNAME">NAME</field>
+                <field name="ALIGN">CENTRE</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="0^%XW0k#7[ujLcXZ4t+q">
+                    <field name="TEXT">毫秒数</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="}DEnvbp`ImtEW5fn1+o-"></shadow>
+                  <block type="type_number" id="zMf.E|obWCvnMj@%cvch"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="Cy-`0%!#*|][;AE3{d%(" deletable="false" movable="false">
+            <field name="TEXT">延迟</field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="!uh,yv%+ruB-vo[gj5rl" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="TOPTYPE">
+          <shadow type="type_null" id=";}{oLF[C*!a(KMLj:SVT"></shadow>
+          <block type="type_null" id="]Gn$z*?A;6gl*qavjIQ("></block>
+        </value>
+        <value name="BOTTOMTYPE">
+          <shadow type="type_null" id="H4g22mV:YH5vsvFPdQix"></shadow>
+          <block type="type_null" id="N7v/v#zcGGn[*^H.+y0-"></block>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="S0G?yVdQ;dP]eiZNn[?q">
+            <mutation colour="#a5935b"></mutation>
+            <field name="HUE">45</field>
+          </block>
+        </value>
+      </block>
+
+      <block type="listen_time_value_block" id="f?Mv,s(!WM`-s6}pw9nQ" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="BOTH"></mutation>
+        <field name="NAME">listen_time_value_block</field>
+        <field name="INLINE">EXT</field>
+        <field name="CONNECTIONS">BOTH</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="+c?np_G$DAS}xU1iJCh9">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="pLzGwN3lRN,{cN])77ec">
+                <field name="TEXT">持续</field>
+              </block>
+            </statement>
+            <next>
+              <block type="input_value" id="%)Ky_83R/QjvF(oT+YP#">
+                <field name="INPUTNAME">LOGIC</field>
+                <field name="ALIGN">CENTRE</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="=zTBS;~yoYe#)zNj/0UY">
+                    <field name="TEXT">逻辑</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="2xH8T6FI$T[9`_Ow6.oK"></shadow>
+                  <block type="type_boolean" id="/1zG7+08PD_v=hCz_hF8"></block>
+                </value>
+                <next>
+                  <block type="input_value" id="u[~/)@WCv^|oE-p@}%ui">
+                    <field name="INPUTNAME">TIME</field>
+                    <field name="ALIGN">LEFT</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id=":v+NJ,wU{|3+nLDeI{Pj">
+                        <field name="TEXT">毫秒数</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="d~QjV]FKL@PriErt5rpA"></shadow>
+                      <block type="type_number" id="kunsAr+n)w_2;)sX#qg%"></block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="JP]T-#:~o73(P=W$g3(k" deletable="false" movable="false">
+            <field name="TEXT">监听时间内值变化</field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="o~~#8ObtJ_O9cv}txdgA" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="TOPTYPE">
+          <shadow type="type_null" id="BeEd-cm=/LvFY:wByjU%"></shadow>
+        </value>
+        <value name="BOTTOMTYPE">
+          <shadow type="type_null" id="@swc^jNs94UUfw+wMu$R"></shadow>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="0}v29;qI.EzMm|?hb0XR">
+            <mutation colour="#a5935b"></mutation>
+            <field name="HUE">45</field>
+          </block>
+        </value>
+      </block>
+
+
+      <block type="listen_time_judge_value_block" id="!]T(.[b3d~zBsy#NM9U=" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="BOTH"></mutation>
+        <field name="NAME">listen_time_judge_value_block</field>
+        <field name="INLINE">INT</field>
+        <field name="CONNECTIONS">BOTH</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="df!/4}AR58U2FbI~]QSc">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="X.}k5CA532n7PPSX!F`q">
+                <field name="TEXT">监听</field>
+              </block>
+            </statement>
+            <next>
+              <block type="input_value" id=",AHv05ro0eA)?z=;.|_Z">
+                <field name="INPUTNAME">LOGIC</field>
+                <field name="ALIGN">CENTRE</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="|W/jt^_%J`@s#Yv#4u!^">
+                    <field name="TEXT">逻辑</field>
+                  </block>
+                </statement>
+                <value name="TYPE">
+                  <shadow type="type_null" id="L]2y=kefxvTpAH:rYw:X"></shadow>
+                  <block type="type_boolean" id="T]RNYie%]u$]H#$;Hy)Q"></block>
+                </value>
+                <next>
+                  <block type="input_value" id="8k-0RY}7A}@Z[?q9~{`Z">
+                    <field name="INPUTNAME">TIME</field>
+                    <field name="ALIGN">CENTRE</field>
+                    <statement name="FIELDS">
+                      <block type="field_static" id=".yA!IcgL_GCZMh{N9.EJ">
+                        <field name="TEXT">在毫秒数</field>
+                      </block>
+                    </statement>
+                    <value name="TYPE">
+                      <shadow type="type_null" id="[)qnRxQU}J8.g%f.ka]D"></shadow>
+                      <block type="type_number" id="G+6?lT^JM4v{W.}!##h4"></block>
+                    </value>
+                    <next>
+                      <block type="input_statement" id="`qHUdf=?NgOD3{VwI^[`">
+                        <field name="INPUTNAME">FUNCTION</field>
+                        <field name="ALIGN">CENTRE</field>
+                        <statement name="FIELDS">
+                          <block type="field_static" id="i[XW0MPXTh5fB%,~lcy^">
+                            <field name="TEXT">有变化</field>
+                          </block>
+                        </statement>
+                        <value name="TYPE">
+                          <shadow type="type_null" id="ez_Vo]l[$VsQ(N1?Y:oh"></shadow>
+                          <block type="type_null" id="*1k7b2w}U`iX*]vGW/l~"></block>
+                        </value>
+                        <next>
+                          <block type="input_dummy" id="P,Nogz2_A*h5,w!=AACC">
+                            <field name="ALIGN">CENTRE</field>
+                            <statement name="FIELDS">
+                              <block type="field_static" id="ry3H@Ht^;or=;c=4,.;:">
+                                <field name="TEXT">无变化</field>
+                              </block>
+                            </statement>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="Fdaf8+RRxeEH4nG@]@t~" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="eN2V%|U.GA2@)c2L|]Xt" deletable="false" movable="false">
+            <field name="TEXT">null</field>
+          </block>
+        </value>
+        <value name="TOPTYPE">
+          <shadow type="type_null" id="T0H3uu_+EA]~[5TA+@2Q"></shadow>
+          <block type="type_null" id="V#BcY5DcVmS?A]xY^#Ov"></block>
+        </value>
+        <value name="BOTTOMTYPE">
+          <shadow type="type_null" id=")$#WMRvH(D0FOSSK}1E2"></shadow>
+          <block type="type_null" id="r,ch_X^^_7#B7x0zm-+L"></block>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="Xjs{G9RL{WPMYJHud-$}">
+            <mutation colour="#a5935b"></mutation>
+            <field name="HUE">45</field>
+          </block>
+        </value>
+      </block>
+      
+    </category>
+    <category name="告警" colour="%{BKY_PROCEDURES_HUE}">
+      <block type="warn_block" deletable="false" movable="false" x="10" y="10">
+        <mutation connections="BOTH"></mutation>
+        <field name="NAME">warn_block</field>
+        <field name="INLINE">AUTO</field>
+        <field name="CONNECTIONS">BOTH</field>
+        <statement name="INPUTS">
+          <block type="input_dummy" id="EVkiHi3bt^=o5~}Il./i">
+            <field name="ALIGN">CENTRE</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="e;*wzkEPC4=XKE#N+X$`">
+                <field name="TEXT">告警</field>
+                <next>
+                  <block type="field_input" id="4b01FS-%%OYG9!0qyj9W">
+                    <field name="TEXT">名称</field>
+                    <field name="FIELDNAME">WARN_NAME</field>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </statement>
+        <value name="TOOLTIP">
+          <block type="text" id="*O3Fw+7qn=X`K,STOiCL" deletable="false" movable="false">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+        <value name="HELPURL">
+          <block type="text" id="9Nr,-^ih14?nC`a|0vsd" deletable="false" movable="false">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+        <value name="TOPTYPE">
+          <shadow type="type_null" id="lPo_FO/3R85Fa[67dFdp"></shadow>
+        </value>
+        <value name="BOTTOMTYPE">
+          <shadow type="type_null" id="An)5Ac(0B,9`3=UtQZ}M"></shadow>
+        </value>
+        <value name="COLOUR">
+          <block type="colour_hue" id="u~n6zVqO9kv+;a0}lH7#">
+            <mutation colour="#a55b5b"></mutation>
+            <field name="HUE">0</field>
+          </block>
+        </value>
+      </block>
+    </category>
+  </xml>
+
+</body>
+</html>
+<script src="./main.js"></script>
